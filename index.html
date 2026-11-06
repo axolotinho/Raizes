@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#152c27">
+<title>Raízes — jogo de palavras</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#12251f;color:#f6efdb;font:15px system-ui,sans-serif}main{max-width:500px;margin:auto;padding:18px 12px 32px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #476052;padding-bottom:12px}.eyebrow{font-size:10px;letter-spacing:.18em;color:#c9c699;text-transform:uppercase}h1{font: bold 43px Georgia,serif;margin:0;letter-spacing:-2px}h2{font:28px Georgia,serif;margin:10px 0}p{line-height:1.5;color:#c6d0bc}button{font:inherit;cursor:pointer;touch-action:manipulation;border:0;border-radius:7px;color:#fff4dd;background:#3b5148;min-height:45px;font-weight:700}button:focus-visible,a:focus-visible{outline:3px solid #e2c67f;outline-offset:3px}#progress{font-size:12px;color:#c9c699}#board{display:grid;gap:6px;width:min(100%,350px);margin:18px auto 10px}.row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.tile{aspect-ratio:1;border:2px solid #42574a;border-radius:6px;display:grid;place-items:center;font-size:25px;font-weight:800}.active .tile{border-color:#81947d}.tile.filled{background:#2d4035}.tile.correct,button.correct{background:#44764e;border-color:#44764e}.tile.present,button.present{background:#97702d;border-color:#97702d}.tile.absent,button.absent{background:#303a36;border-color:#303a36;color:#adb5ad}#message{text-align:center;min-height:23px;color:#e2c67f;margin:12px 0;font-size:13px}#keyboard{display:grid;gap:6px}.keys{display:flex;gap:4px;justify-content:center}.keys button{flex:1;min-width:0;padding:0;font-size:13px}.keys button.wide{flex:1.8;font-size:11px}.legend{display:flex;gap:12px;justify-content:center;font-size:10px;color:#c6d0bc;margin:15px 0}.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;background:#44764e}.legend span:nth-child(2):before{background:#97702d}.legend span:nth-child(3):before{background:#303a36}#result{background:#213c30;border:1px solid #58705a;border-radius:14px;padding:18px;margin:15px 0}#next{width:100%;background:#e1c883;color:#182c23;margin-top:15px}a{color:#e1c883}details{font-size:12px;color:#c6d0bc;margin-top:20px}summary{cursor:pointer;padding:7px 0}#hint{background:transparent;color:#ddc884;font-size:12px;min-height:32px}#hint:disabled{opacity:.6}[hidden]{display:none!important}
+</style>
+</head>
+<body><main>
+<header><div><div class="eyebrow">Cada palavra guarda uma história</div><h1>raízes<span style="color:#dfbf76">.</span></h1></div><span id="progress"></span></header>
+<p style="text-align:center;font-size:13px">Descubra a palavra de origem indígena.<br><strong>6 letras · 6 tentativas</strong></p>
+<div class="legend"><span>No lugar</span><span>Outro lugar</span><span>Não aparece</span></div>
+<div id="board" aria-label="Tentativas"></div>
+<div id="message" role="status" aria-live="polite"></div>
+<div style="text-align:center"><button id="hint">Preciso de uma pista</button></div>
+<div id="keyboard" aria-label="Teclado"></div>
+<section id="result" hidden tabindex="-1"><div class="eyebrow" id="outcome"></div><h2 id="word"></h2><p id="meaning"></p><p id="history"></p><a id="source" target="_blank" rel="noopener noreferrer">Consultar a fonte ↗</a><button id="next">Próxima palavra →</button></section>
+<details><summary>Como jogar e sobre as palavras</summary><p>Digite um palpite e toque em ENTER. Verde indica a letra na posição certa. Amarelo indica que ela aparece em outra posição. Cinza indica que não há outra ocorrência disponível dessa letra. Letras repetidas são avaliadas pela quantidade na resposta.</p><p>Este jogo aceita qualquer sequência de seis letras como palpite. Acentos e cedilha são ignorados. Use o teclado da tela ou o do computador.</p><p>Esta edição reúne quatro palavras incorporadas ao português, associadas ao tupi nas fontes. Há muitas línguas indígenas diferentes. Ao acertar, você libera o significado e a história. Se as tentativas acabarem, a resposta e a história também aparecem para você aprender.</p></details>
+</main>
+<script>
+const words = [
+{word:"PIPOCA",meaning:"Milho que se abre quando aquecido.",history:"O Dicio registra a origem no tupi pi'poka, com o sentido de pele estalada. A imagem presente no nome acompanha a transformação do grão pelo calor. A palavra preserva no português uma contribuição indígena ao vocabulário da alimentação.",hint:"Está na cozinha e também no cinema.",source:"https://www.dicio.com.br/pipocas/"},
+{word:"PETECA",meaning:"Brinquedo lançado e mantido no ar com golpes da mão.",history:"Segundo o Instituto Socioambiental, o nome vem do tupi e se relaciona a tapear ou golpear com as mãos. Povos indígenas fazem diferentes tipos de peteca, inclusive com palhas de milho. A página apresenta, entre outros exemplos, a tobdaé dos Xavante.",hint:"Uma brincadeira que usa as mãos.",source:"https://www.mirim.org/index.php/pt-br/como-vivem/brincadeiras"},
+{word:"TAPERA",meaning:"Casa ou povoação abandonada, frequentemente em ruínas.",history:"O nome é associado ao tupi e à ideia de antiga aldeia ou aldeia que deixou de existir. No português, passou a designar também uma habitação abandonada. É um exemplo de como palavras indígenas passaram a nomear lugares e paisagens no cotidiano.",hint:"Um lugar onde já morou gente.",source:"https://www.infopedia.pt/dicionarios/lingua-portuguesa/tapera"},
+{word:"JACARÉ",meaning:"Réptil de pele escamosa, cauda forte e hábitos ligados à água.",history:"A palavra entrou no português a partir do tupi. O nome indígena permaneceu no vocabulário usado para descrever a fauna brasileira. Hoje também aparece em expressões e outros sentidos registrados nos dicionários.",hint:"Um animal encontrado em rios e lagoas.",source:"https://www.infopedia.pt/dicionarios/lingua-portuguesa/jacaré"}
+];
+const $ = id => document.getElementById(id);
+const normalize = value => value.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase();
+let index=0, guesses=[], current="", finished=false;
+function grade(guess, answer) {
+ const result=Array(6).fill("absent"), remaining={};
+ for(let i=0;i<6;i++) {
+  if(guess[i]===answer[i]) result[i]="correct";
+  else remaining[answer[i]]=(remaining[answer[i]]||0)+1;
+ }
+ for(let i=0;i<6;i++) {
+  if(result[i]!=="correct" && remaining[guess[i]]>0) {
+   result[i]="present"; remaining[guess[i]]--;
+  }
+ }
+ return result;
+}
+function render() {
+ $("board").replaceChildren();
+ const keyboardState={}, rank={absent:1,present:2,correct:3};
+ for(let row=0;row<6;row++){
+  const line=document.createElement("div");line.className="row";
+  if(row===guesses.length&&!finished)line.classList.add("active");
+  const text=guesses[row] || (row===guesses.length?current:"");
+  const colors=guesses[row]?grade(text,normalize(words[index].word)):[];
+  for(let col=0;col<6;col++){
+   const tile=document.createElement("div");
+   tile.className="tile "+(colors[col]||(text[col]?"filled":""));
+   tile.textContent=text[col]||"";
+   tile.setAttribute("aria-label",text[col] ? text[col]+(colors[col]?{correct:" na posição certa",present:" em outra posição",absent:" sem ocorrência disponível"}[colors[col]]:""):"vazia");
+   line.append(tile);
+   if(colors[col]&&(!keyboardState[text[col]]||rank[colors[col]]>rank[keyboardState[text[col]]]))keyboardState[text[col]]=colors[col];
+  }
+  $("board").append(line);
+ }
+ document.querySelectorAll("[data-key]").forEach(button=>{button.className=(button.dataset.key.length>1?"wide ":"")+(keyboardState[button.dataset.key]||"");});
+}
+function submit(){
+ if(current.length!==6){$("message").textContent="Complete as seis letras primeiro.";return;}
+ if(guesses.includes(current)){$("message").textContent="Você já tentou essa combinação.";return;}
+ guesses.push(current);
+ const won=current===normalize(words[index].word);current="";
+ finished=won||guesses.length===6;
+ $("message").textContent=finished?"": "Tentativa "+guesses.length+" de 6 registrada.";
+ render();
+ if(finished){
+  $("keyboard").hidden=true;$("hint").hidden=true;$("result").hidden=false;
+  $("outcome").textContent=won?"História desbloqueada · "+guesses.length+"/6":"As tentativas acabaram. Conheça a palavra";
+  $("word").textContent=words[index].word;
+  $("meaning").textContent=words[index].meaning;$("history").textContent=words[index].history;$("source").href=words[index].source;
+  $("next").textContent=index===words.length-1?"Recomeçar coleção ↻":"Próxima palavra →";
+  $("result").focus();
+ }
+}
+function input(key){
+ if(finished)return;
+ if(key==="ENTER"){submit();return;}
+ if(key==="BACKSPACE")current=current.slice(0,-1);
+ else if(/^[A-Z]$/.test(key)&&current.length<6)current+=key;
+ render();
+}
+for(const row of ["QWERTYUIOP".split(""),"ASDFGHJKL".split(""),["ENTER",..."ZXCVBNM","BACKSPACE"]]){
+ const line=document.createElement("div");line.className="keys";
+ row.forEach(key=>{const button=document.createElement("button");button.dataset.key=key;button.textContent=key==="BACKSPACE"?"⌫":key;button.setAttribute("aria-label",key==="BACKSPACE"?"Apagar":key);button.onclick=()=>input(key);line.append(button);});
+ $("keyboard").append(line);
+}
+document.addEventListener("keydown",event=>{
+ if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest("a,summary,#next,#hint"))return;
+ const key=normalize(event.key);
+ if(key==="ENTER"||key==="BACKSPACE"||/^[A-Z]$/.test(key)){event.preventDefault();input(key);}
+});
+$("hint").onclick=()=>{$("message").textContent=words[index].hint;};
+function start(){
+ guesses=[];current="";finished=false;$("result").hidden=true;$("keyboard").hidden=false;$("hint").hidden=false;
+ $("progress").textContent=(index+1)+" / "+words.length;
+ $("message").textContent="Qual palavra está escondida?";render();
+}
+$("next").onclick=()=>{index=(index+1)%words.length;start();document.querySelector("[data-key]").focus();};
+start();
+</script></body></html>
